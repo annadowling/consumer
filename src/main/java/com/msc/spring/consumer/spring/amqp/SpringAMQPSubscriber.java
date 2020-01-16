@@ -9,6 +9,7 @@ package com.msc.spring.consumer.spring.amqp;/***********************************
  *************************************************************** */
 
 import com.google.gson.Gson;
+import com.msc.spring.consumer.message.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class MessageConsumer {
+public class SpringAMQPSubscriber {
 
     @RabbitListener(queues="${rabbitmq.queueName}")
     public void listen(byte[] message) {

@@ -76,7 +76,7 @@ public class Config {
     }
 
     @Bean
-    MessageListenerAdapter listenerAdapter(MessageConsumer listener) {
+    MessageListenerAdapter listenerAdapter(SpringAMQPSubscriber listener) {
         return new MessageListenerAdapter(listener, "listen");
     }
 }
