@@ -21,6 +21,24 @@ public class RabbitMQProperties {
     private String queueName;
     private String exchangeName;
     private String routingKey;
+    private String host;
+    private Boolean autoAck;
+
+    public Boolean getAutoAck() {
+        return autoAck;
+    }
+
+    public void setAutoAck(Boolean autoAck) {
+        this.autoAck = autoAck;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
 
     public String getQueueName() {
         return queueName;
