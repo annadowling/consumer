@@ -15,7 +15,7 @@ import org.zeromq.ZMQ;
  * Created by annadowling on 2020-01-16.
  */
 
-public class ZMQSubscriber {
+public class JEROMQSubscriber {
 
     @Value("${zeromq.address}")
     private static String bindAddress;
