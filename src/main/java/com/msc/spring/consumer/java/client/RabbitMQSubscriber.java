@@ -8,41 +8,55 @@ package com.msc.spring.consumer.java.client;/***********************************
  *
  *************************************************************** */
 
-import com.msc.spring.consumer.spring.amqp.RabbitMQProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by annadowling on 2020-01-16.
  */
 
+@Component
 public class RabbitMQSubscriber {
 
-    @Autowired
-    private static RabbitMQProperties rabbitMQProperties;
+    @Value("${rabbitmq.queueName}")
+    private static String queueName;
 
-    public static void main(String[] argv) throws Exception {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(rabbitMQProperties.getHost());
+    @Value("${rabbitmq.host}")
+    private static String host;
 
-        try (Connection connection = factory.newConnection();
-             Channel channel = connection.createChannel()) {
-            consumeMessage(channel);
+    @Value("${rabbitmq.exchangeName}")
+    private static String exchangeName;
+
+    @Value("${rabbitmq.autoAck}")
+    private static boolean autoAck;
+
+    @Value("${rabbitmq.java.client.enabled}")
+    private static boolean rabbitJavaClientEnabled;
+
+    public static void consumeMessagefromRabbitJavaClient() throws Exception {
+        if (rabbitJavaClientEnabled) {
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost(host);
+
+            try (Connection connection = factory.newConnection();
+                 Channel channel = connection.createChannel()
+            ) {
+
+                channel.queueDeclare(queueName, true, false, false, null);
+                System.out.println(" [*] Waiting for messages.");
+
+                DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+                    String message = new String(delivery.getBody(), "UTF-8");
+                    System.out.println(" [x] Received Message: '" + message + "'");
+                };
+                channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
+                });
+            }
         }
-    }
-
-    public static void consumeMessage(Channel channel) throws Exception{
-        channel.queueDeclare(rabbitMQProperties.getQueueName(), true, false, false, null);
-        System.out.println(" [*] Waiting for messages.");
-
-        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-            String message = new String(delivery.getBody(), "UTF-8");
-            System.out.println(" [x] Received Message: '" + message + "'");
-        };
-        channel.basicConsume(rabbitMQProperties.getQueueName(), rabbitMQProperties.getAutoAck(), deliverCallback, consumerTag -> { });
 
     }
 }

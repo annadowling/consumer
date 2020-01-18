@@ -32,7 +32,7 @@ dependencies {
 	//rabbitmq java client
 	// https://mvnrepository.com/artifact/com.rabbitmq/amqp-client
 	compile group: 'com.rabbitmq', name: 'amqp-client', version: '5.8.0'
-
+	
 	//jeromq jms
 	// https://mvnrepository.com/artifact/org.zeromq/jeromq-jms
 	compile group: 'org.zeromq', name: 'jeromq-jms', version: '3.0.1-RELEASE'

@@ -11,6 +11,7 @@ package com.msc.spring.consumer.spring.amqp;/***********************************
 import com.google.gson.Gson;
 import com.msc.spring.consumer.message.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,11 +21,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringAMQPSubscriber {
 
-    @RabbitListener(queues="${rabbitmq.queueName}")
+    @Value("${spring.amqp.enabled}")
+    private static boolean springAMQPEnabled;
+
+    @RabbitListener(queues = "${rabbitmq.queueName}")
     public void listen(byte[] message) {
-        String msg = new String(message);
-        Message consumedMessage = new Gson().fromJson(msg, Message.class);
-        System.out.println("Received a new message...");
-        System.out.println(consumedMessage.toString());
+        if (springAMQPEnabled) {
+            String msg = new String(message);
+            Message consumedMessage = new Gson().fromJson(msg, Message.class);
+            System.out.println("Received a new message...");
+            System.out.println(consumedMessage.toString());
+        }
     }
+
 }

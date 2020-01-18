@@ -9,33 +9,36 @@ package com.msc.spring.consumer.jeromq.jms;/************************************
  *************************************************************** */
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.zeromq.ZMQ;
 
 /**
  * Created by annadowling on 2020-01-16.
  */
 
+@Component
 public class JEROMQSubscriber {
 
     @Value("${zeromq.address}")
     private static String bindAddress;
 
-    public static void main(String[] args) throws Exception {
-        ZMQ.Context ctx = ZMQ.context(1);
+    @Value("${jeromq.enabled}")
+    private static boolean jeroMQEnabled;
 
-        ZMQ.Socket sub = ctx.socket(ZMQ.SUB);
-        sub.subscribe("".getBytes());
-        sub.connect(bindAddress);
 
-        // Eliminate slow subscriber problem
-        Thread.sleep(100);
-        logReceivedMessage(sub);
+    public void consumeJEROMQMessage() throws Exception {
+        if (jeroMQEnabled) {
+            ZMQ.Context ctx = ZMQ.context(1);
 
-        sub.close();
-        ctx.close();
-    }
+            ZMQ.Socket subscriber = ctx.socket(ZMQ.SUB);
+            subscriber.subscribe("".getBytes());
+            subscriber.connect(bindAddress);
 
-    public static void logReceivedMessage(ZMQ.Socket subscriber){
-        System.out.println("Message received is: " + subscriber.recvStr());
+            // Eliminate slow subscriber problem
+            Thread.sleep(100);
+            subscriber.close();
+            ctx.close();
+            System.out.println("Message received is: " + subscriber.recvStr());
+        }
     }
 }
