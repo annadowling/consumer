@@ -8,13 +8,12 @@ package com.msc.spring.consumer.java.client;/***********************************
  *
  *************************************************************** */
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.DeliverCallback;
+import com.rabbitmq.client.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * Created by annadowling on 2020-01-16.
@@ -24,13 +23,28 @@ import org.springframework.stereotype.Component;
 public class RabbitMQSubscriber {
 
     @Value("${rabbitmq.queueName}")
-    private static String queueName;
+    private String queueName;
 
-    @Value("${spring.rabbitmq.host}")
-    private static String host;
+    @Value("${rabbitmq.host}")
+    private String host;
+
+    @Value("${rabbitmq.port}")
+    private Integer port;
+
+    @Value("${rabbitmq.username}")
+    private String rabbitUserName;
+
+    @Value("${rabbitmq.password}")
+    private String rabbitPassWord;
+
+    @Value("${rabbitmq.virtualhost}")
+    private String virtualHost;
 
     @Value("${rabbitmq.exchangeName}")
-    private static String exchangeName;
+    private String exchangeName;
+
+    @Value("${rabbitmq.routingKey}")
+    private String routingKey;
 
     @Value("${rabbitmq.autoAck}")
     private static boolean autoAck;
@@ -39,26 +53,40 @@ public class RabbitMQSubscriber {
     private static boolean rabbitJavaClientEnabled;
 
     @Bean
-    public static void consumeMessagefromRabbitJavaClient() throws Exception {
+    public void consumeMessagefromRabbitJavaClient() throws Exception {
+
         if (rabbitJavaClientEnabled) {
-            ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(host);
+            try {
+                Channel channel = createChannelConnection();
 
-            try (Connection connection = factory.newConnection();
-                 Channel channel = connection.createChannel()
-            ) {
-
-                channel.queueDeclare(queueName, true, false, false, null);
                 System.out.println(" [*] Waiting for messages.");
-
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                     String message = new String(delivery.getBody(), "UTF-8");
                     System.out.println(" [x] Received Message: '" + message + "'");
                 };
                 channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
                 });
+            } catch (IOException e) {
+                System.out.println("IOException encountered = " + e.getLocalizedMessage());
             }
         }
+    }
 
+    Channel createChannelConnection() throws Exception {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(host);
+        factory.setPassword(rabbitPassWord);
+        factory.setUsername(rabbitUserName);
+        factory.setPort(port);
+        factory.setVirtualHost(virtualHost);
+        Connection connection = factory.newConnection();
+
+        Channel channel = connection.createChannel();
+
+        channel.queueDeclare(queueName, true, false, false, null);
+        channel.exchangeDeclare(exchangeName, BuiltinExchangeType.DIRECT);
+        channel.queueBind(queueName, exchangeName, routingKey);
+
+        return channel;
     }
 }
