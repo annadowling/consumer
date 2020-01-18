@@ -9,6 +9,7 @@ package com.msc.spring.consumer.jeromq.jms;/************************************
  *************************************************************** */
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.zeromq.ZMQ;
 
@@ -25,7 +26,7 @@ public class JEROMQSubscriber {
     @Value("${jeromq.enabled}")
     private static boolean jeroMQEnabled;
 
-
+    @Bean
     public void consumeJEROMQMessage() throws Exception {
         if (jeroMQEnabled) {
             ZMQ.Context ctx = ZMQ.context(1);

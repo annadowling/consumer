@@ -17,11 +17,11 @@ import java.io.Serializable;
 public class Message implements Serializable {
 
     private String notificationType;
-    private String msg;
+    private String message;
 
 
-    public Message(String notificationType, String msg) {
+    public Message(String notificationType, String message) {
         this.notificationType = notificationType;
-        this.msg = msg;
+        this.message = message;
     }
 }

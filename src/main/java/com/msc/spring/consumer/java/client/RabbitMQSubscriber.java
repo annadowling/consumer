@@ -13,6 +13,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +26,7 @@ public class RabbitMQSubscriber {
     @Value("${rabbitmq.queueName}")
     private static String queueName;
 
-    @Value("${rabbitmq.host}")
+    @Value("${spring.rabbitmq.host}")
     private static String host;
 
     @Value("${rabbitmq.exchangeName}")
@@ -37,6 +38,7 @@ public class RabbitMQSubscriber {
     @Value("${rabbitmq.java.client.enabled}")
     private static boolean rabbitJavaClientEnabled;
 
+    @Bean
     public static void consumeMessagefromRabbitJavaClient() throws Exception {
         if (rabbitJavaClientEnabled) {
             ConnectionFactory factory = new ConnectionFactory();
