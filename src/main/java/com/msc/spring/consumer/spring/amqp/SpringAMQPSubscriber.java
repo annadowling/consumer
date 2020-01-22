@@ -8,30 +8,26 @@ package com.msc.spring.consumer.spring.amqp;/***********************************
  *
  *************************************************************** */
 
-import com.google.gson.Gson;
-import com.msc.spring.consumer.message.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by annadowling on 2020-01-16.
  */
 
-@Component
-public class SpringAMQPSubscriber {
+@Service
+public class SpringAMQPSubscriber implements MessageListener {
 
     @Value("${spring.amqp.enabled}")
     private static boolean springAMQPEnabled;
 
-    @RabbitListener(queues = "${rabbitmq.queueName}")
-    public void listen(byte[] message) {
+    public void onMessage(Message message) {
         if (springAMQPEnabled) {
-            String msg = new String(message);
-            Message consumedMessage = new Gson().fromJson(msg, Message.class);
-            System.out.println("Received a new message...");
-            System.out.println(consumedMessage.toString());
+            System.out.println("Consuming Message - " + new String(message.getBody()));
         }
     }
-
 }
+
+

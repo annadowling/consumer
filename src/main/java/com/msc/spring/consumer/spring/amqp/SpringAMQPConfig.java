@@ -8,12 +8,11 @@ package com.msc.spring.consumer.spring.amqp;/***********************************
  *
  *************************************************************** */
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,28 +49,30 @@ public class SpringAMQPConfig {
     private String virtualHost;
 
     @Bean
-    public ConnectionFactory connectionFactory() {
+    Queue queue() {
+        return new Queue(queueName, false);
+    }
+
+    //create custom connection factory
+	@Bean
+	ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host);
         connectionFactory.setUsername(rabbitUserName);
         connectionFactory.setPassword(rabbitPassWord);
         connectionFactory.setPort(port);
         connectionFactory.setVirtualHost(virtualHost);
 
-        declareRabbitArchitecture(connectionFactory);
-
         return connectionFactory;
-    }
+	}
 
-    @Bean
-    RabbitAdmin declareRabbitArchitecture(CachingConnectionFactory connectionFactory){
-        RabbitAdmin admin = new RabbitAdmin(connectionFactory());
-        DirectExchange topicExchange = new DirectExchange(exchangeName);
-        Binding binding = new Binding(queueName, Binding.DestinationType.QUEUE, exchangeName, routingKey, null);
+    //create MessageListenerContainer using custom connection factory
+	@Bean
+    MessageListenerContainer messageListenerContainer() {
+		SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
+		simpleMessageListenerContainer.setConnectionFactory(connectionFactory());
+		simpleMessageListenerContainer.setQueues(queue());
+		simpleMessageListenerContainer.setMessageListener(new SpringAMQPSubscriber());
+		return simpleMessageListenerContainer;
 
-        admin.declareQueue(new Queue(queueName));
-        admin.declareExchange(topicExchange);
-        admin.declareBinding(binding);
-
-        return admin;
-    }
+	}
 }
