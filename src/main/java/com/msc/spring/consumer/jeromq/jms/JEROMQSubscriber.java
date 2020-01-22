@@ -8,6 +8,7 @@ package com.msc.spring.consumer.jeromq.jms;/************************************
  *
  *************************************************************** */
 
+import com.msc.spring.consumer.interfaces.ConsumerSetup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import org.zeromq.ZMQ;
  */
 
 @Component
-public class JEROMQSubscriber {
+public class JEROMQSubscriber implements ConsumerSetup {
 
     @Value("${zeromq.address}")
     private static String bindAddress;
@@ -26,20 +27,28 @@ public class JEROMQSubscriber {
     @Value("${jeromq.enabled}")
     private static boolean jeroMQEnabled;
 
+    final String errorMessage = "Exception encountered = ";
+
     @Bean
-    public void consumeJEROMQMessage() throws Exception {
+    @Override
+    public void consumeMessage() {
         if (jeroMQEnabled) {
-            ZMQ.Context ctx = ZMQ.context(1);
+            try {
+                ZMQ.Context ctx = ZMQ.context(1);
 
-            ZMQ.Socket subscriber = ctx.socket(ZMQ.SUB);
-            subscriber.subscribe("".getBytes());
-            subscriber.connect(bindAddress);
+                ZMQ.Socket subscriber = ctx.socket(ZMQ.SUB);
+                subscriber.subscribe("".getBytes());
+                subscriber.connect(bindAddress);
 
-            // Eliminate slow subscriber problem
-            Thread.sleep(100);
-            subscriber.close();
-            ctx.close();
-            System.out.println("Message received is: " + subscriber.recvStr());
+                // Eliminate slow subscriber problem
+                Thread.sleep(100);
+                subscriber.close();
+                ctx.close();
+                System.out.println("Message received is: " + subscriber.recvStr());
+            } catch (Exception e) {
+                System.out.println(errorMessage + e.getLocalizedMessage());
+
+            }
         }
     }
 }

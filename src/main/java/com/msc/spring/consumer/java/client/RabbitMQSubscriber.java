@@ -8,19 +8,18 @@ package com.msc.spring.consumer.java.client;/***********************************
  *
  *************************************************************** */
 
+import com.msc.spring.consumer.interfaces.ConsumerSetup;
 import com.rabbitmq.client.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 /**
  * Created by annadowling on 2020-01-16.
  */
 
 @Component
-public class RabbitMQSubscriber {
+public class RabbitMQSubscriber implements ConsumerSetup {
 
     @Value("${rabbitmq.queueName}")
     private String queueName;
@@ -52,9 +51,14 @@ public class RabbitMQSubscriber {
     @Value("${rabbitmq.java.client.enabled}")
     private static boolean rabbitJavaClientEnabled;
 
-    @Bean
-    public void consumeMessagefromRabbitJavaClient() throws Exception {
+    Channel channel;
 
+    final String errorMessage = "Exception encountered = ";
+
+
+    @Bean
+    @Override
+    public void consumeMessage() {
         if (rabbitJavaClientEnabled) {
             try {
                 Channel channel = createChannelConnection();
@@ -66,27 +70,52 @@ public class RabbitMQSubscriber {
                 };
                 channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
                 });
-            } catch (IOException e) {
-                System.out.println("IOException encountered = " + e.getLocalizedMessage());
+            } catch (Exception e) {
+                System.out.println(errorMessage + e.getLocalizedMessage());
             }
         }
     }
 
-    Channel createChannelConnection() throws Exception {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(host);
-        factory.setPassword(rabbitPassWord);
-        factory.setUsername(rabbitUserName);
-        factory.setPort(port);
-        factory.setVirtualHost(virtualHost);
-        Connection connection = factory.newConnection();
+    /**
+     * Channel to RabbitMQ server used for declaring architecture(queues, exchanges, bindings)
+     * and publishing messages.
+     *
+     * @return Channel
+     */
 
-        Channel channel = connection.createChannel();
+    Channel createChannelConnection() {
+        ConnectionFactory factory = createConnection();
+        try {
+            Connection connection = factory.newConnection();
 
-        channel.queueDeclare(queueName, true, false, false, null);
-        channel.exchangeDeclare(exchangeName, BuiltinExchangeType.DIRECT);
-        channel.queueBind(queueName, exchangeName, routingKey);
+            Channel channel = connection.createChannel();
+            channel.queueDeclare(queueName, false, false, false, null);
+            channel.exchangeDeclare(exchangeName, BuiltinExchangeType.DIRECT);
+            channel.queueBind(queueName, exchangeName, routingKey);
+
+        } catch (Exception e) {
+            System.out.println(errorMessage + e.getLocalizedMessage());
+        }
 
         return channel;
+    }
+
+    /**
+     * Creates connection to RabbitMQ server using specific env variables
+     *
+     * @return ConnectionFactory
+     */
+    ConnectionFactory createConnection() {
+        ConnectionFactory factory = new ConnectionFactory();
+        try {
+            factory.setHost(host);
+            factory.setPassword(rabbitPassWord);
+            factory.setUsername(rabbitUserName);
+            factory.setPort(port);
+            factory.setVirtualHost(virtualHost);
+        } catch (Exception e) {
+            System.out.println(errorMessage + e.getLocalizedMessage());
+        }
+        return factory;
     }
 }
