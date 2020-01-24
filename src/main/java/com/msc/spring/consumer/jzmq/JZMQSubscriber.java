@@ -1,4 +1,4 @@
-package com.msc.spring.consumer.jeromq.jms;
+package com.msc.spring.consumer.jzmq;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -11,20 +11,20 @@ import org.zeromq.ZMQ;
  */
 
 @Component
-@ConditionalOnProperty(prefix = "jeromq", name = "enabled", havingValue = "true")
-public class JEROMQSubscriber {
+@ConditionalOnProperty(prefix = "jzmq", name = "enabled", havingValue = "true")
+public class JZMQSubscriber {
 
     @Value("${zeromq.address}")
     private String bindAddress;
 
-    @Value("${jeromq.enabled}")
-    private boolean jeroMQEnabled;
+    @Value("${jzmq.enabled}")
+    private boolean jzmqEnabled;
 
     final String errorMessage = "Exception encountered = ";
 
     @Bean
-    public void consumeJeroMQMessage() {
-        if (jeroMQEnabled) {
+    public void consumeJZMQMessage() {
+        if (jzmqEnabled) {
             // Prepare our context and subscriber
             try {
                 ZMQ.Context context = ZMQ.context(1);

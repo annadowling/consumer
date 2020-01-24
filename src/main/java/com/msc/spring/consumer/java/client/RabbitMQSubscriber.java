@@ -1,12 +1,4 @@
-package com.msc.spring.consumer.java.client;/***************************************************************
- * Copyright (c) 2020 Errigal Inc.
- *
- * This software is the confidential and proprietary information
- * of Errigal, Inc.  You shall not disclose such confidential
- * information and shall use it only in accordance with the
- * license agreement you entered into with Errigal.
- *
- *************************************************************** */
+package com.msc.spring.consumer.java.client;
 
 import com.rabbitmq.client.*;
 import org.springframework.beans.factory.annotation.Value;
