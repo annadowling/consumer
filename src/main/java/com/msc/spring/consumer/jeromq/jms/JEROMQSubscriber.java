@@ -33,21 +33,24 @@ public class JEROMQSubscriber {
     @Bean
     public void consumeJeroMQMessage() {
         if (jeroMQEnabled) {
+            // Prepare our context and subscriber
             try {
-                ZMQ.Context ctx = ZMQ.context(1);
+                ZMQ.Context context = ZMQ.context(1);
+                ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
 
-                ZMQ.Socket subscriber = ctx.socket(ZMQ.SUB);
-                subscriber.subscribe("".getBytes());
                 subscriber.connect(bindAddress);
+                subscriber.subscribe("B".getBytes());
 
-                // Eliminate slow subscriber problem
-                Thread.sleep(100);
-                subscriber.close();
-                ctx.close();
-                System.out.println("Message received is: " + subscriber.recvStr());
+                System.out.println("Starting Subscriber..");
+                int i = 0;
+                while (true) {
+                    String address = subscriber.recvStr();
+                    String contents = subscriber.recvStr();
+                    System.out.println(address + ":" + new String(contents) + ": " + (i));
+                    i++;
+                }
             } catch (Exception e) {
                 System.out.println(errorMessage + e.getLocalizedMessage());
-
             }
         }
     }
