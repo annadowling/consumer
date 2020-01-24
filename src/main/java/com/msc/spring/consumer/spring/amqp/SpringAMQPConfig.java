@@ -14,7 +14,9 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -22,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
  */
 
 @Configuration
+@ConditionalOnProperty(prefix = "spring.amqp", name = "enabled", havingValue = "true")
 public class SpringAMQPConfig {
 
     @Value("${rabbitmq.exchangeName}")

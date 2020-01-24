@@ -8,9 +8,9 @@ package com.msc.spring.consumer.java.client;/***********************************
  *
  *************************************************************** */
 
-import com.msc.spring.consumer.interfaces.ConsumerSetup;
 import com.rabbitmq.client.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,8 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class RabbitMQSubscriber implements ConsumerSetup {
+@ConditionalOnProperty(prefix = "rabbitmq.java.client", name = "enabled", havingValue = "true")
+public class RabbitMQSubscriber {
 
     @Value("${rabbitmq.queueName}")
     private String queueName;
@@ -57,8 +58,7 @@ public class RabbitMQSubscriber implements ConsumerSetup {
 
 
     @Bean
-    @Override
-    public void consumeMessage() {
+    public void consumeRMQMessage() {
         if (rabbitJavaClientEnabled) {
             try {
                 Channel channel = createChannelConnection();

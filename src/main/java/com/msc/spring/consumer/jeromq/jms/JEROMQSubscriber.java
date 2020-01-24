@@ -8,8 +8,8 @@ package com.msc.spring.consumer.jeromq.jms;/************************************
  *
  *************************************************************** */
 
-import com.msc.spring.consumer.interfaces.ConsumerSetup;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.zeromq.ZMQ;
@@ -19,19 +19,19 @@ import org.zeromq.ZMQ;
  */
 
 @Component
-public class JEROMQSubscriber implements ConsumerSetup {
+@ConditionalOnProperty(prefix = "jeromq", name = "enabled", havingValue = "true")
+public class JEROMQSubscriber {
 
     @Value("${zeromq.address}")
-    private static String bindAddress;
+    private String bindAddress;
 
     @Value("${jeromq.enabled}")
-    private static boolean jeroMQEnabled;
+    private boolean jeroMQEnabled;
 
     final String errorMessage = "Exception encountered = ";
 
     @Bean
-    @Override
-    public void consumeMessage() {
+    public void consumeJeroMQMessage() {
         if (jeroMQEnabled) {
             try {
                 ZMQ.Context ctx = ZMQ.context(1);
