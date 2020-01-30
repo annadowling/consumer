@@ -1,6 +1,8 @@
 package com.msc.spring.consumer.java.client;
 
+import com.msc.spring.consumer.message.MessageUtils;
 import com.rabbitmq.client.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -39,12 +41,15 @@ public class RabbitMQSubscriber {
     private String routingKey;
 
     @Value("${rabbitmq.autoAck}")
-    private static boolean autoAck;
+    private boolean autoAck;
 
     @Value("${rabbitmq.java.client.enabled}")
-    private static boolean rabbitJavaClientEnabled;
+    private boolean rabbitJavaClientEnabled;
 
     Channel channel;
+
+    @Autowired
+    MessageUtils messageUtils;
 
     final String errorMessage = "Exception encountered = ";
 
@@ -57,6 +62,8 @@ public class RabbitMQSubscriber {
 
                 System.out.println(" [*] Waiting for messages.");
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+                    byte[] messageBody = delivery.getBody();
+                    messageUtils.saveMessage(messageBody);
                     String message = new String(delivery.getBody(), "UTF-8");
                     System.out.println(" [x] Received Message: '" + message + "'");
                 };
@@ -80,7 +87,7 @@ public class RabbitMQSubscriber {
         try {
             Connection connection = factory.newConnection();
 
-            Channel channel = connection.createChannel();
+            channel = connection.createChannel();
             channel.queueDeclare(queueName, false, false, false, null);
             channel.exchangeDeclare(exchangeName, BuiltinExchangeType.DIRECT);
             channel.queueBind(queueName, exchangeName, routingKey);

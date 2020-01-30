@@ -1,10 +1,10 @@
 package com.msc.spring.consumer.message;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
 
 @Entity
-@Table(name = "messages")
+@Table(name = "message")
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
