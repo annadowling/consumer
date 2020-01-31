@@ -53,4 +53,19 @@ public class MessageUtils {
 
         messageRepository.save(message);
     }
+
+    /**
+     * Save a message entry to the db for each received message
+     * @param HashMap<String, String>
+     */
+    public void saveMessageMap(HashMap<String, String> messageMap){
+        Message message = new Message();
+        message.setReceiveTime(new Date());
+        message.setCorrelationId(messageMap.get("correlationId"));
+        message.setRequestType(messageMap.get("messageId"));
+        message.setMessageVolume(Integer.parseInt(messageMap.get("messageVolume")));
+        message.setMessageSize(Integer.parseInt(messageMap.get("messageSize")));
+
+        messageRepository.save(message);
+    }
 }

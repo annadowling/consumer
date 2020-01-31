@@ -5,6 +5,7 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -61,13 +62,27 @@ public class SpringAMQPConfig {
 	}
 
     //create MessageListenerContainer using custom connection factory
-	@Bean
-    MessageListenerContainer messageListenerContainer() {
-		SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
-		simpleMessageListenerContainer.setConnectionFactory(connectionFactory());
-		simpleMessageListenerContainer.setQueues(queue());
-		simpleMessageListenerContainer.setMessageListener(new SpringAMQPSubscriber());
-		return simpleMessageListenerContainer;
+//	@Bean
+//    MessageListenerContainer messageListenerContainer() {
+//		SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
+//		simpleMessageListenerContainer.setConnectionFactory(connectionFactory());
+//		simpleMessageListenerContainer.setQueues(queue());
+//		simpleMessageListenerContainer.setMessageListener(new SpringAMQPSubscriber());
+//		return simpleMessageListenerContainer;
+//
+//	}
 
-	}
+    @Bean
+    SimpleMessageListenerContainer container(MessageListenerAdapter listenerAdapter) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory());
+        container.setQueueNames(queueName);
+        container.setMessageListener(listenerAdapter);
+        return container;
+    }
+
+    @Bean
+    MessageListenerAdapter listenerAdapter(SpringAMQPSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber, "receiveMessage");
+    }
 }

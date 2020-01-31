@@ -6,15 +6,19 @@ import org.springframework.amqp.core.MessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by annadowling on 2020-01-16.
  */
 
-@Service
+@Component
 @ConditionalOnProperty(prefix = "spring.amqp", name = "enabled", havingValue = "true")
-public class SpringAMQPSubscriber implements MessageListener {
+public class SpringAMQPSubscriber {
 
     @Value("${spring.amqp.enabled}")
     private boolean springAMQPEnabled;
@@ -22,14 +26,30 @@ public class SpringAMQPSubscriber implements MessageListener {
     @Autowired
     MessageUtils messageUtils;
 
+    private CountDownLatch latch = new CountDownLatch(1);
 
-    public void onMessage(Message message) {
+
+    public void receiveMessage(HashMap<String, String> message) {
         if (springAMQPEnabled) {
-            System.out.println("Consuming Message - " + new String(message.getBody()));
-            byte[] messageBody = message.getBody();
-            messageUtils.saveMessage(messageBody);
+            System.out.println("Consuming Message from Spring AMQP Rabbit");
+            messageUtils.saveMessageMap(message);
+            System.out.println("Received <" + message + ">");
+            latch.countDown();
         }
     }
+
+    public CountDownLatch getLatch() {
+        return latch;
+    }
+
+
+//    public void onMessage(Message message) {
+//        if (springAMQPEnabled) {
+//            System.out.println("Consuming Message - " + new String(message.getBody()));
+//            byte[] messageBody = message.getBody();
+//            messageUtils.saveMessage(messageBody);
+//        }
+//    }
 }
 
 
