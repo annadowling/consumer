@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.zeromq.ZMQ;
+import zmq.Msg;
 
 /**
  * Created by annadowling on 2020-01-16.
@@ -34,6 +35,7 @@ public class JEROMQSubscriber {
             try {
                 ZMQ.Context context = ZMQ.context(1);
                 ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
+                Msg msg =null;
 
                 subscriber.connect(bindAddress);
                 subscriber.subscribe("B".getBytes());
@@ -42,7 +44,7 @@ public class JEROMQSubscriber {
                 int i = 0;
                 while (true) {
                     String message = subscriber.recvStr();
-                    byte[] messageBody = subscriber.recv(0);
+                    byte[] messageBody = subscriber.recv();
 
                     messageUtils.saveMessage(messageBody);
                     System.out.println(" [x] Received Message: '" + message + "'");
