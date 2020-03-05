@@ -31,6 +31,9 @@ public class RabbitMQSubscriber {
     @Value("${rabbitmq.password}")
     private String rabbitPassWord;
 
+    @Value("${rabbitmq.durable}")
+    private boolean durableQueue;
+
     @Value("${rabbitmq.virtualhost}")
     private String virtualHost;
 
@@ -88,7 +91,7 @@ public class RabbitMQSubscriber {
             Connection connection = factory.newConnection();
 
             channel = connection.createChannel();
-            channel.queueDeclare(queueName, false, false, false, null);
+            channel.queueDeclare(queueName, durableQueue, false, false, null);
             channel.exchangeDeclare(exchangeName, BuiltinExchangeType.DIRECT);
             channel.queueBind(queueName, exchangeName, routingKey);
 

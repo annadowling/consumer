@@ -41,15 +41,6 @@ public class SpringAMQPSubscriber {
     public CountDownLatch getLatch() {
         return latch;
     }
-
-
-//    public void onMessage(Message message) {
-//        if (springAMQPEnabled) {
-//            System.out.println("Consuming Message - " + new String(message.getBody()));
-//            byte[] messageBody = message.getBody();
-//            messageUtils.saveMessage(messageBody);
-//        }
-//    }
 }
 
 

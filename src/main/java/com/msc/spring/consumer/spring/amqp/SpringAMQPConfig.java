@@ -26,6 +26,9 @@ public class SpringAMQPConfig {
     @Value("${rabbitmq.queueName}")
     private String queueName;
 
+    @Value("${rabbitmq.durable}")
+    private boolean durableQueue;
+
     @Value("${rabbitmq.routingKey}")
     private String routingKey;
 
@@ -46,7 +49,7 @@ public class SpringAMQPConfig {
 
     @Bean
     Queue queue() {
-        return new Queue(queueName, false);
+        return new Queue(queueName, durableQueue);
     }
 
     //create custom connection factory
@@ -60,17 +63,6 @@ public class SpringAMQPConfig {
 
         return connectionFactory;
 	}
-
-    //create MessageListenerContainer using custom connection factory
-//	@Bean
-//    MessageListenerContainer messageListenerContainer() {
-//		SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
-//		simpleMessageListenerContainer.setConnectionFactory(connectionFactory());
-//		simpleMessageListenerContainer.setQueues(queue());
-//		simpleMessageListenerContainer.setMessageListener(new SpringAMQPSubscriber());
-//		return simpleMessageListenerContainer;
-//
-//	}
 
     @Bean
     SimpleMessageListenerContainer container(MessageListenerAdapter listenerAdapter) {
