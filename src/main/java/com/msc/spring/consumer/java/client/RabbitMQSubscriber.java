@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.zeromq.ZMQ;
 
 /**
  * Created by annadowling on 2020-01-16.
@@ -58,7 +60,31 @@ public class RabbitMQSubscriber {
 
 
     @Bean
+    @ConditionalOnProperty(prefix = "multi.thread", name = "enabled", havingValue = "false")
     public void consumeRMQMessage() {
+        if (rabbitJavaClientEnabled) {
+            try {
+                Channel channel = createChannelConnection();
+
+                System.out.println(" [*] Waiting for messages.");
+                DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+                    byte[] messageBody = delivery.getBody();
+                    messageUtils.saveMessage(messageBody);
+                    String message = new String(delivery.getBody(), "UTF-8");
+                    System.out.println(" [x] Received Message: '" + message + "'");
+                };
+                channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
+                });
+            } catch (Exception e) {
+                System.out.println(errorMessage + e.getLocalizedMessage());
+            }
+        }
+    }
+
+    @Bean
+    @Async
+    @ConditionalOnProperty(prefix = "multi.thread", name = "enabled", havingValue = "true")
+    public void consumeRMQMessageMultiThread() {
         if (rabbitJavaClientEnabled) {
             try {
                 Channel channel = createChannelConnection();

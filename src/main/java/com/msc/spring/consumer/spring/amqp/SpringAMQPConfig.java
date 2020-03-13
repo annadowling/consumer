@@ -47,6 +47,9 @@ public class SpringAMQPConfig {
     @Value("${rabbitmq.virtualhost}")
     private String virtualHost;
 
+    @Value("${multi.thread.enabled}")
+    private boolean multiThreaded;
+
     @Bean
     Queue queue() {
         return new Queue(queueName, durableQueue);
@@ -75,6 +78,10 @@ public class SpringAMQPConfig {
 
     @Bean
     MessageListenerAdapter listenerAdapter(SpringAMQPSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber, "receiveMessage");
+        if(multiThreaded){
+            return new MessageListenerAdapter(subscriber, "receiveMessageMultiThread");
+        }else{
+            return new MessageListenerAdapter(subscriber, "receiveMessage");
+        }
     }
 }
