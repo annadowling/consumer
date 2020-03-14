@@ -27,9 +27,6 @@ public class JEROMQSubscriber {
     @Value("${jeromq.enabled}")
     private boolean jeroMQEnabled;
 
-    @Value("${multi.thread.enabled}")
-    private boolean multiThreaded;
-
     final String errorMessage = "Exception encountered = ";
 
     @Autowired
