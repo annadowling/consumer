@@ -31,9 +31,9 @@ public class MessageUtils {
             bin = new ObjectInputStream(new ByteArrayInputStream(bytes));
             obj = bin.readObject();
         } catch (IOException e) {
-            System.out.println("Unable to convert bytes to ArrayList<String> " + e);
+            System.out.println("Unable to convert bytes " + e);
         } catch (ClassNotFoundException e) {
-            System.out.println("Unable to convert bytes to ArrayList<String> " + e);
+            System.out.println("Unable to convert bytes " + e);
         }
 
         return obj;
@@ -45,16 +45,18 @@ public class MessageUtils {
      * @param bytes
      */
     public void saveMessage(byte[] bytes, boolean isMultiThreaded) {
-        Message message = new Message();
-        message.setReceiveTime(new Date());
-        Map<String, String> receivedObject = (HashMap<String, String>) byte2Object(bytes);
-        message.setCorrelationId(receivedObject.get("correlationId"));
-        message.setRequestType(receivedObject.get("messageId"));
-        message.setMessageVolume(Integer.parseInt(receivedObject.get("messageVolume")));
-        message.setMessageSize(Integer.parseInt(receivedObject.get("messageSize")));
-        message.setMultiThreaded(isMultiThreaded);
+        if(bytes.length > 1){
+            Message message = new Message();
+            message.setReceiveTime(new Date());
+            Map<String, String> receivedObject = (HashMap<String, String>) byte2Object(bytes);
+            message.setCorrelationId(receivedObject.get("correlationId"));
+            message.setRequestType(receivedObject.get("messageId"));
+            message.setMessageVolume(Integer.parseInt(receivedObject.get("messageVolume")));
+            message.setMessageSize(Integer.parseInt(receivedObject.get("messageSize")));
+            message.setMultiThreaded(isMultiThreaded);
 
-        messageRepository.save(message);
+            messageRepository.save(message);
+        }
     }
 
     /**
