@@ -51,7 +51,7 @@ public class JEROMQSubscriber {
                         receiveMessageMultiThread(subscriber);
                     }else{
                         byte[] messageBody = subscriber.recv();
-                        messageUtils.saveMessage(messageBody);
+                        messageUtils.saveMessage(messageBody, false);
                         System.out.println(" [x] Received Message: '" + messageBody + "'");
                     }
                     i++;
@@ -65,7 +65,7 @@ public class JEROMQSubscriber {
     @Async
     void receiveMessageMultiThread(ZMQ.Socket subscriber){
         byte[] messageBody = subscriber.recv();
-        messageUtils.saveMessage(messageBody);
+        messageUtils.saveMessage(messageBody, true);
         System.out.println(" [x] Received Message: '" + messageBody + "'");
     }
 }

@@ -69,7 +69,7 @@ public class RabbitMQSubscriber {
                 System.out.println(" [*] Waiting for messages.");
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                     byte[] messageBody = delivery.getBody();
-                    messageUtils.saveMessage(messageBody);
+                    messageUtils.saveMessage(messageBody, false);
                     String message = new String(delivery.getBody(), "UTF-8");
                     System.out.println(" [x] Received Message: '" + message + "'");
                 };
@@ -92,7 +92,7 @@ public class RabbitMQSubscriber {
                 System.out.println(" [*] Waiting for messages.");
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                     byte[] messageBody = delivery.getBody();
-                    messageUtils.saveMessage(messageBody);
+                    messageUtils.saveMessage(messageBody, true);
                     String message = new String(delivery.getBody(), "UTF-8");
                     System.out.println(" [x] Received Message: '" + message + "'");
                 };

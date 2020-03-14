@@ -33,7 +33,7 @@ public class SpringAMQPSubscriber {
     public void receiveMessage(HashMap<String, String> message) {
         if (springAMQPEnabled) {
             System.out.println("Consuming Message from Spring AMQP Rabbit");
-            messageUtils.saveMessageMap(message);
+            messageUtils.saveMessageMap(message, false);
             System.out.println("Received <" + message + ">");
             latch.countDown();
         }
@@ -43,7 +43,7 @@ public class SpringAMQPSubscriber {
     public void receiveMessageMultiThread(HashMap<String, String> message) {
         if (springAMQPEnabled) {
             System.out.println("Consuming Message from Spring AMQP Rabbit");
-            messageUtils.saveMessageMap(message);
+            messageUtils.saveMessageMap(message, true);
             System.out.println("Received <" + message + ">");
             latch.countDown();
         }
