@@ -1,7 +1,10 @@
 package com.msc.spring.consumer.java.client;
 
 import com.msc.spring.consumer.message.MessageUtils;
+import com.msc.spring.consumer.spring.amqp.SpringAMQPSubscriber;
 import com.rabbitmq.client.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -17,6 +20,8 @@ import org.zeromq.ZMQ;
 @Component
 @ConditionalOnProperty(prefix = "rabbitmq.java.client", name = "enabled", havingValue = "true")
 public class RabbitMQSubscriber {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQSubscriber.class);
 
     @Value("${rabbitmq.queueName}")
     private String queueName;
@@ -66,17 +71,17 @@ public class RabbitMQSubscriber {
             try {
                 Channel channel = createChannelConnection();
 
-                System.out.println(" [*] Waiting for messages.");
+                LOGGER.info("Waiting for RABBITMQ CLIENT messages.");
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                     byte[] messageBody = delivery.getBody();
                     messageUtils.saveMessage(messageBody, false);
                     String message = new String(delivery.getBody(), "UTF-8");
-                    System.out.println(" [x] Received Message: '" + message + "'");
+                    LOGGER.info("Received RABBITMQ CLIENT Message: '" + message + "'");
                 };
                 channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
                 });
             } catch (Exception e) {
-                System.out.println(errorMessage + e.getLocalizedMessage());
+                LOGGER.info(errorMessage + e.getLocalizedMessage());
             }
         }
     }
@@ -89,17 +94,17 @@ public class RabbitMQSubscriber {
             try {
                 Channel channel = createChannelConnection();
 
-                System.out.println(" [*] Waiting for messages.");
+                LOGGER.info("Waiting for RABBITMQ CLIENT messages.");
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                     byte[] messageBody = delivery.getBody();
                     messageUtils.saveMessage(messageBody, true);
                     String message = new String(delivery.getBody(), "UTF-8");
-                    System.out.println(" [x] Received Message: '" + message + "'");
+                    LOGGER.info("Received RABBITMQ CLIENT Message: '" + message + "'");
                 };
                 channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
                 });
             } catch (Exception e) {
-                System.out.println(errorMessage + e.getLocalizedMessage());
+                LOGGER.info(errorMessage + e.getLocalizedMessage());
             }
         }
     }
@@ -122,7 +127,7 @@ public class RabbitMQSubscriber {
             channel.queueBind(queueName, exchangeName, routingKey);
 
         } catch (Exception e) {
-            System.out.println(errorMessage + e.getLocalizedMessage());
+            LOGGER.info(errorMessage + e.getLocalizedMessage());
         }
 
         return channel;
@@ -142,7 +147,7 @@ public class RabbitMQSubscriber {
             factory.setPort(port);
             factory.setVirtualHost(virtualHost);
         } catch (Exception e) {
-            System.out.println(errorMessage + e.getLocalizedMessage());
+            LOGGER.info(errorMessage + e.getLocalizedMessage());
         }
         return factory;
     }

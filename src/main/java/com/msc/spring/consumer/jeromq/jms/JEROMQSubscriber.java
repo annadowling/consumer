@@ -1,6 +1,8 @@
 package com.msc.spring.consumer.jeromq.jms;
 
 import com.msc.spring.consumer.message.MessageUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,6 +22,8 @@ import zmq.Msg;
 @Component
 @ConditionalOnProperty(prefix = "jeromq", name = "enabled", havingValue = "true")
 public class JEROMQSubscriber {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JEROMQSubscriber.class);
 
     @Value("${zeromq.address}")
     private String bindAddress;
@@ -43,7 +47,7 @@ public class JEROMQSubscriber {
                 subscriber.connect(bindAddress);
                 subscriber.subscribe("B".getBytes(ZMQ.CHARSET));
 
-                System.out.println("Starting Subscriber..");
+                LOGGER.info("Starting Subscriber..");
                 int i = 0;
                 while (true) {
                     // Read envelope with address
@@ -51,7 +55,7 @@ public class JEROMQSubscriber {
                     // Read message contents
                     byte[] messageBody = subscriber.recv();
                     messageUtils.saveMessage(messageBody, true);
-                    System.out.println(" [x] Received Message: '" + messageBody + "'" + "for address: " + messageAddress);
+                    LOGGER.info("Received JEROMQ Message: '" + messageBody + "'" + "for address: " + messageAddress);
                     i++;
                 }
             }
@@ -69,7 +73,7 @@ public class JEROMQSubscriber {
                 subscriber.connect(bindAddress);
                 subscriber.subscribe("B".getBytes(ZMQ.CHARSET));
 
-                System.out.println("Starting Subscriber..");
+                LOGGER.info("Starting Subscriber..");
                 int i = 0;
                 while (true) {
                     // Read envelope with address
@@ -77,7 +81,7 @@ public class JEROMQSubscriber {
                     // Read message contents
                     byte[] messageBody = subscriber.recv();
                     messageUtils.saveMessage(messageBody, false);
-                    System.out.println(" [x] Received Message: '" + messageBody + "'" + "for address: " + messageAddress);
+                   LOGGER.info("Received JEROMQ : '" + messageBody + "'" + "for address: " + messageAddress);
                     i++;
                 }
             }

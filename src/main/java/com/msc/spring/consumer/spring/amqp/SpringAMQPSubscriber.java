@@ -1,6 +1,9 @@
 package com.msc.spring.consumer.spring.amqp;
 
+import com.msc.spring.consumer.jeromq.jms.JEROMQSubscriber;
 import com.msc.spring.consumer.message.MessageUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,8 @@ import java.util.concurrent.CountDownLatch;
 @ConditionalOnProperty(prefix = "spring.amqp", name = "enabled", havingValue = "true")
 public class SpringAMQPSubscriber {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringAMQPSubscriber.class);
+
     @Value("${spring.amqp.enabled}")
     private boolean springAMQPEnabled;
 
@@ -32,9 +37,9 @@ public class SpringAMQPSubscriber {
 
     public void receiveMessage(HashMap<String, String> message) {
         if (springAMQPEnabled) {
-            System.out.println("Consuming Message from Spring AMQP Rabbit");
+            LOGGER.info("Consuming Message from Spring AMQP Rabbit");
             messageUtils.saveMessageMap(message, false);
-            System.out.println("Received <" + message + ">");
+            LOGGER.info("Received <" + message + ">");
             latch.countDown();
         }
     }
@@ -42,9 +47,9 @@ public class SpringAMQPSubscriber {
     @Async
     public void receiveMessageMultiThread(HashMap<String, String> message) {
         if (springAMQPEnabled) {
-            System.out.println("Consuming Message from Spring AMQP Rabbit");
+            LOGGER.info("Consuming Message from Spring AMQP Rabbit");
             messageUtils.saveMessageMap(message, true);
-            System.out.println("Received <" + message + ">");
+            LOGGER.info("Received <" + message + ">");
             latch.countDown();
         }
     }
