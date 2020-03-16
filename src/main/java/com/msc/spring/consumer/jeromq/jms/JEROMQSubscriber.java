@@ -55,7 +55,7 @@ public class JEROMQSubscriber {
                     // Read message contents
                     byte[] messageBody = subscriber.recv();
                     messageUtils.saveMessage(messageBody, true);
-                    LOGGER.info("Received JEROMQ Message: '" + messageBody + "'" + "for address: " + messageAddress);
+                    LOGGER.info("Received JEROMQ Message: for address: " + messageAddress);
                     i++;
                 }
             }
@@ -81,7 +81,7 @@ public class JEROMQSubscriber {
                     // Read message contents
                     byte[] messageBody = subscriber.recv();
                     messageUtils.saveMessage(messageBody, false);
-                   LOGGER.info("Received JEROMQ : '" + messageBody + "'" + "for address: " + messageAddress);
+                    LOGGER.info("Received JEROMQ Message: for address: " + messageAddress);
                     i++;
                 }
             }

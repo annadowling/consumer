@@ -76,7 +76,7 @@ public class RabbitMQSubscriber {
                     byte[] messageBody = delivery.getBody();
                     messageUtils.saveMessage(messageBody, false);
                     String message = new String(delivery.getBody(), "UTF-8");
-                    LOGGER.info("Received RABBITMQ CLIENT Message: '" + message + "'");
+                    LOGGER.info("Received RABBITMQ CLIENT Message");
                 };
                 channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
                 });
@@ -99,7 +99,7 @@ public class RabbitMQSubscriber {
                     byte[] messageBody = delivery.getBody();
                     messageUtils.saveMessage(messageBody, true);
                     String message = new String(delivery.getBody(), "UTF-8");
-                    LOGGER.info("Received RABBITMQ CLIENT Message: '" + message + "'");
+                    LOGGER.info("Received RABBITMQ CLIENT Message");
                 };
                 channel.basicConsume(queueName, autoAck, deliverCallback, consumerTag -> {
                 });

@@ -39,7 +39,6 @@ public class SpringAMQPSubscriber {
         if (springAMQPEnabled) {
             LOGGER.info("Consuming Message from Spring AMQP Rabbit");
             messageUtils.saveMessageMap(message, false);
-            LOGGER.info("Received <" + message + ">");
             latch.countDown();
         }
     }
@@ -49,7 +48,6 @@ public class SpringAMQPSubscriber {
         if (springAMQPEnabled) {
             LOGGER.info("Consuming Message from Spring AMQP Rabbit");
             messageUtils.saveMessageMap(message, true);
-            LOGGER.info("Received <" + message + ">");
             latch.countDown();
         }
     }
